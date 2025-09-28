@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Set, List, Tuple, Iterable, Any
+from typing import Set, List, Dict, Tuple, Iterable, Any
 import abc
 import sqlite3
 from contextlib import contextmanager
@@ -9,6 +9,16 @@ from functools import cached_property
 @dataclass
 class Cursor:
     cur: sqlite3.Cursor
+
+    def Relation(self, name: str, *args: str, **kwargs: str) -> "Relation":
+        p = Relation(name, make_args([*args], kwargs), distinct=False)
+        self.create(p)
+        return p
+
+    def RelationSet(self, name: str, *args: str, **kwargs: str) -> "Relation":
+        p = Relation(name, make_args([*args], kwargs), distinct=True)
+        self.create(p)
+        return p
 
     def create(self, rel: "Relation") -> sqlite3.Cursor:
         return self.cur.execute(rel.create_sql)
@@ -65,27 +75,15 @@ def vars(*names: str) -> List[Var]:
     return [Var(n) for n in names]
 
 
-def RelationSet(name: str, **kwargs: str) -> "Relation":
-    p = Relation(name, **kwargs)
-    p.distinct = True
-    return p
+def make_args(args: List[str], kwargs: Dict[str, str]):
+    return [(f"_x{i}", arg) for i, arg in enumerate(args)] + list(kwargs.items())
 
 
+@dataclass
 class Relation:
     name: str
-    distinct: bool = False
     args: List[Tuple[str, str]]
-
-    def __init__(self, name: str, *args: str, **kwargs: str):
-        self.name = name
-        self.distinct = False
-        self.args = [(f"_x{i}", arg) for i, arg in enumerate(args)] + list(
-            kwargs.items()
-        )
-
-    def __str__(self):
-        args = ", ".join(f"{k}: {v}" for k, v in self.args)
-        return f"{self.name}({args})"
+    distinct: bool
 
     @cached_property
     def create_sql(self) -> str:
