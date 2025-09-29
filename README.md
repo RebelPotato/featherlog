@@ -1,10 +1,6 @@
 # Featherlog.py
 
-Datalog for SQLite in python. It is:
-
-- Simple, just a thin layer over sqlite3.
-- Practical, represents a large subset of SQL
-- Pretty, almost valid datalog
+Datalog for SQLite in python, by compiling datalog to SQL.
 
 Here's an example:
 

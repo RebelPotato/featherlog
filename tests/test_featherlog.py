@@ -20,7 +20,6 @@ def test_query(snapshot):
 
 def test_throw(snapshot):
     x, y, z = fl.vars("x", "y", "z")
-    x, y, z = fl.vars("x", "y", "z")
     conn = fl.Connection(sqlite3.connect(":memory:", autocommit=False))
     with conn.cursor() as cur:
         edge = cur.Relation("edge", x="INT", y="INT")
@@ -34,4 +33,5 @@ def test_throw(snapshot):
             raise NotImplementedError
 
     with conn.cursor() as cur:
+        # no paths added
         assert list(cur.select([x, y], path(x, y))) == snapshot

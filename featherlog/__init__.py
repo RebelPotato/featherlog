@@ -175,7 +175,7 @@ class Or(Query):
         left_sql_code = f"SELECT {names} FROM ({left_sql.code})"
         right_sql_code = f"SELECT {names} FROM ({right_sql.code})"
         return Sql(
-            f"SELECT {names}\nFROM ({left_sql_code}\nUNION {right_sql_code})",
+            f"SELECT {names}\nFROM ({left_sql_code}\nUNION ALL {right_sql_code})",
             left_sql.args + right_sql.args,
         )
 
